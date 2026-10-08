@@ -1,0 +1,119 @@
+{
+  "incident_id": "inc-6a745be2a422",
+  "execution_id": "kestra-exec-20261004-001",
+  "contract_version": "1.0.0",
+  "prompt_version": "inc-v1",
+  "model_version": "deterministic-baseline",
+  "generated_at_utc": "2026-10-04T02:11:51.988172+00:00",
+  "confirmed_facts": {
+    "execution_id": "kestra-exec-20261004-001",
+    "contract_version": "1.0.0",
+    "total_failures_in_input": 3,
+    "explained_categories": 2,
+    "categories": [
+      {
+        "rule_id": "erp_transactions.amount.q0",
+        "field": "amount",
+        "error_signature": "mustBe=0",
+        "actual_count": 1,
+        "must_be": 0
+      },
+      {
+        "rule_id": "erp_transactions.missing_support_flag.q0",
+        "field": "missing_support_flag",
+        "error_signature": "mustBe=0",
+        "actual_count": 3,
+        "must_be": 0
+      }
+    ]
+  },
+  "anomaly_evidence": {
+    "failing_rules": [
+      "erp_transactions.amount.q0",
+      "erp_transactions.missing_support_flag.q0"
+    ],
+    "located_transactions": [],
+    "category_level_guidance": [
+      {
+        "failure_rule": "amount",
+        "transaction_id": null,
+        "source_request": null,
+        "requester": null,
+        "reason": "交易金额绝对值超过契约约定的 500 万上限",
+        "suggestion": "核实该笔交易金额是否录入错误或超出授权额度，修正后重新执行契约检查",
+        "located": false,
+        "actual_count": 1
+      },
+      {
+        "failure_rule": "missing_support_flag",
+        "transaction_id": null,
+        "source_request": null,
+        "requester": null,
+        "reason": "存在缺少支持性凭证的记录（契约要求为 0）",
+        "suggestion": "补充支持性凭证后重新检查",
+        "located": false,
+        "actual_count": 3
+      }
+    ],
+    "kestra_log_excerpt": [
+      "01:01:52 ERROR datacontract-test: Quality Check amount failed: Actual custom_sql(amount) returned 1 row exceeding 5000000",
+      "01:01:53 ERROR datacontract-test: Quality Check missing_support_flag failed: 3 rows with missing support document"
+    ]
+  },
+  "potential_causes": [
+    {
+      "rule_id": "erp_transactions.amount.q0",
+      "explanation": "【规则 erp_transactions.amount.q0】交易金额（允许负数）。该字段要求满足 mustBe=0，即不允许出现约束之外的值。当前检测到 1 条违反。这意味着存在不满足该字段业务约束的交易记录，可能对应录入错误、流程越界或系统集成偏差，应结合契约变更单（CCR）流程追溯责任人并定位根因。",
+      "source": "deterministic",
+      "cache_hit": true
+    },
+    {
+      "rule_id": "erp_transactions.missing_support_flag.q0",
+      "explanation": "【规则 erp_transactions.missing_support_flag.q0】是否缺少支持性文件。该字段要求满足 mustBe=0，即不允许出现约束之外的值。当前检测到 3 条违反。这意味着存在不满足该字段业务约束的交易记录，可能对应录入错误、流程越界或系统集成偏差，应结合契约变更单（CCR）流程追溯责任人并定位根因。",
+      "source": "deterministic",
+      "cache_hit": true
+    }
+  ],
+  "repair_suggestions": [
+    {
+      "failure_rule": "amount",
+      "transaction_id": null,
+      "source_request": null,
+      "requester": null,
+      "reason": "交易金额绝对值超过契约约定的 500 万上限",
+      "suggestion": "核实该笔交易金额是否录入错误或超出授权额度，修正后重新执行契约检查",
+      "located": false
+    },
+    {
+      "failure_rule": "missing_support_flag",
+      "transaction_id": null,
+      "source_request": null,
+      "requester": null,
+      "reason": "存在缺少支持性凭证的记录（契约要求为 0）",
+      "suggestion": "补充支持性凭证后重新检查",
+      "located": false
+    }
+  ],
+  "emit": {
+    "emit": true,
+    "suppressed_count": 0,
+    "window_start": 1791079800,
+    "execution_id": "kestra-exec-20261004-001",
+    "failure_rule": "inc-6a745be2a422"
+  },
+  "emit_brief": {
+    "execution_id": "kestra-exec-20261004-001",
+    "failure_rule": "inc-6a745be2a422",
+    "window_start": 1791079800,
+    "window_seconds": 300,
+    "total_alerts_in_window": 1,
+    "suppressed": 0,
+    "message": "规则 inc-6a745be2a422 在 Execution kestra-exec-20261004-001 的窗口 [1791079800, 1791080100) 内共触发 1 次，已合并为一条简报（抑制 0 次重复告警）。"
+  },
+  "boundary": {
+    "llm_mode": "deterministic-baseline",
+    "kestra_log_source": "structured-mirror-input(simulated in demo)",
+    "locate_mode": "offline",
+    "note": "演示未直连 LLM；定位经契约视图再 JOIN 源表；同一次失败批次 incident_id 幂等。"
+  }
+}

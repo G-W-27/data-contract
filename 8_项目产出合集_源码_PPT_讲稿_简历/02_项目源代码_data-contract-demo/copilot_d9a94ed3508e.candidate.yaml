@@ -1,0 +1,192 @@
+dataContractSpecification: 0.9.3
+id: erp-accounting-risk-contract
+
+info:
+  title: "ERP Accounting Risk Data Contract"
+  version: "1.0.0"
+  description: "验证 ERP 会计风险核心数据的完整性与合规性"
+
+servers:
+  postgres:
+    type: postgres
+    host: localhost
+    port: 5432
+    database: erp_demo
+    schema: public
+    user: kestra
+
+models:
+  erp_transactions:
+    description: "ERP 交易记录核心字段"
+    type: table
+
+    fields:
+
+      transaction_id:
+        type: varchar
+        maxLength: 30
+        description: "交易唯一标识"
+        required: true
+        unique: true
+
+      erp_system:
+        type: varchar
+        maxLength: 30
+        description: "ERP 系统来源"
+        required: true
+
+      posting_datetime:
+        type: timestamp
+        description: "过账时间"
+        required: true
+
+      amount:
+        type: numeric
+        description: "交易金额（允许负数）"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*)
+              FROM erp_transactions
+              WHERE ABS(amount) > 5000000
+            mustBe: 0
+
+          - type: sql
+            description: "Contract Copilot generated rule copilot_d9a94ed3508e: business_type=采购; conditions: amount = 5000000; requirements: approval_level = 3"
+            query: |
+              SELECT COUNT(*)
+              FROM erp_transactions et
+              JOIN business_requests br
+                ON ('TXN-' || br.request_id) = et.transaction_id
+              WHERE br.business_type = '采购'
+                AND et.amount = 5000000
+                AND NOT (et.approval_level = 3)
+            mustBe: 0
+      currency:
+        type: varchar
+        maxLength: 10
+        description: "币种"
+        required: true
+
+      gl_account:
+        type: varchar
+        maxLength: 30
+        description: "总账科目"
+        required: true
+
+      manual_entry_flag:
+        type: integer
+        description: "是否手工录入（0=否，1=是）"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE manual_entry_flag NOT IN (0, 1)
+            mustBe: 0
+
+      risk_class:
+        type: varchar
+        maxLength: 30
+        description: "风险分类"
+        required: true
+
+      approval_level:
+        type: integer
+        description: "审批层级（1-4）"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE approval_level NOT IN (1,2,3,4)
+            mustBe: 0
+
+      is_round_amount:
+        type: integer
+        description: "是否为整数金额"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE is_round_amount NOT IN (0, 1)
+            mustBe: 0
+
+      high_value_flag:
+        type: integer
+        description: "是否高价值交易"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE high_value_flag NOT IN (0, 1)
+            mustBe: 0
+
+      posting_hour:
+        type: integer
+        description: "过账小时（0-23）"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE posting_hour < 0 OR posting_hour > 23
+            mustBe: 0
+
+      posting_dayofweek:
+        type: integer
+        description: "过账星期（0-6）"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE posting_dayofweek < 0 OR posting_dayofweek > 6
+            mustBe: 0
+
+      same_preparer_approver_flag:
+        type: integer
+        description: "制单人与审批人是否相同"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE same_preparer_approver_flag <> 0
+            mustBe: 0
+
+      missing_support_flag:
+        type: integer
+        description: "是否缺少支持性文件"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE missing_support_flag <> 0
+            mustBe: 0
+
+      approval_below_expected_flag:
+        type: integer
+        description: "审批层级是否低于预期"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE approval_below_expected_flag <> 0
+            mustBe: 0
+
+      near_approval_threshold_flag:
+        type: integer
+        description: "是否接近审批阈值"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE near_approval_threshold_flag <> 0
+            mustBe: 0
+
+      manual_after_hours_flag:
+        type: integer
+        description: "非工作时间手工录入标志（只要求 0/1 合法，不要求必须为 0）"
+        required: true
+        quality:
+          - type: sql
+            query: |
+              SELECT COUNT(*) FROM erp_transactions WHERE manual_after_hours_flag NOT IN (0, 1)
+            mustBe: 0

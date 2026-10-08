@@ -1,0 +1,7 @@
+[
+  {
+    "rule_id": "erp_transactions.amount.q0",
+    "actual_count": 1,
+    "passed": false
+  }
+]

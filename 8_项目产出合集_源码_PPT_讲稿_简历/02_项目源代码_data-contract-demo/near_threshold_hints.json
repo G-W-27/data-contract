@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "hint_count": 1,
+  "hints": [
+    {
+      "rule_id": "erp_transactions.amount.q0",
+      "field": "amount",
+      "new_threshold": 8000000.0,
+      "band_low": 7600000.0,
+      "band_high": 8400000.0,
+      "near_count": 2,
+      "near_examples": [
+        "T001",
+        "T002"
+      ],
+      "text": "规则 erp_transactions.amount.q0 新阈值 8,000,000；历史有 2 笔落在 [7,600,000, 8,400,000] 邻近带内（示例 ['T001', 'T002']），提交前请评估影响。"
+    }
+  ],
+  "note": "仅提示，不拦截；提交仍须经 ① 变更单与 ② 审批"
+}

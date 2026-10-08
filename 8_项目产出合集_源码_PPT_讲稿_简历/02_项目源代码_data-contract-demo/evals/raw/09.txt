@@ -1,0 +1,1 @@
+{"business_type":"采购","conditions":[{"field":"amount","operator":">=","value":0}],"requirements":[{"field":"self_approval_flag","operator":"=","value":1}]}

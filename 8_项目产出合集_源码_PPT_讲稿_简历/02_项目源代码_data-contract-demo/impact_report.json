@@ -1,0 +1,51 @@
+{
+  "assessment_id": "cia-082959f21d1d",
+  "execution_id": "exec-demo",
+  "change_request_id": "CCR99999",
+  "old_version": "1.0.0",
+  "new_version": "1.1.0",
+  "contract_path": "financial_data_contract.yaml",
+  "diff_rules": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "classification": {
+    "overall": {
+      "PASS->PASS": 4,
+      "PASS->FAIL": 2,
+      "FAIL->PASS": 0,
+      "FAIL->FAIL": 2
+    },
+    "per_rule": {
+      "erp_transactions.approval_level.q0": {
+        "PASS->PASS": 1,
+        "PASS->FAIL": 0,
+        "FAIL->PASS": 0,
+        "FAIL->FAIL": 1
+      },
+      "erp_transactions.amount.q0": {
+        "PASS->PASS": 3,
+        "PASS->FAIL": 2,
+        "FAIL->PASS": 0,
+        "FAIL->FAIL": 1
+      }
+    },
+    "flips_to_fail": [
+      "T002",
+      "T005"
+    ],
+    "transaction_count": 6
+  },
+  "requires_approver_signoff": true,
+  "signoff": {
+    "required": true,
+    "role": "contract_approver",
+    "rule": "requested_by != approved_by",
+    "signed_by": null,
+    "signed_at": null,
+    "status": "PENDING"
+  },
+  "assessor": "E001",
+  "timestamp": 0.0
+}

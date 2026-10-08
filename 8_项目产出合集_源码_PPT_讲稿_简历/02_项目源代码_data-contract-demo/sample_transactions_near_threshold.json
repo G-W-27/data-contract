@@ -1,0 +1,7 @@
+[
+  {"transaction_id": "T001", "amount": 7800000},
+  {"transaction_id": "T002", "amount": 8200000},
+  {"transaction_id": "T003", "amount": 5000000},
+  {"transaction_id": "T004", "amount": 9000000},
+  {"transaction_id": "T005", "amount": 3000000}
+]

@@ -1,0 +1,1 @@
+{"business_type":"采购","conditions":[{"field":"amount","operator":">","value":5000000}],"requirements":[{"field":"approval_level","operator":">=","value":4},{"field":"manual_entry_flag","operator":"=","value":0}]}

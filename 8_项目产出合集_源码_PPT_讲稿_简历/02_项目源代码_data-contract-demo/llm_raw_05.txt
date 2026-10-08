@@ -1,0 +1,1 @@
+{"business_type":"销售","conditions":[{"field":"amount","operator":">","value":5000001}],"requirements":[{"field":"approval_level","operator":"=","value":4},{"field":"manual_entry_flag","operator":"=","value":0}]}

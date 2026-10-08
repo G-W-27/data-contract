@@ -1,0 +1,20 @@
+--- financial_data_contract.yaml
++++ financial_data_contract.yaml (candidate)
+@@ -52,6 +52,17 @@
+               WHERE ABS(amount) > 5000000
+             mustBe: 0
+ 
++          - type: sql
++            description: "Contract Copilot generated rule copilot_ea2932e71851: business_type=采购; conditions: amount >= 0; requirements: approval_level = 0 AND manual_entry_flag = 1"
++            query: |
++              SELECT COUNT(*)
++              FROM erp_transactions et
++              JOIN business_requests br
++                ON ('TXN-' || br.request_id) = et.transaction_id
++              WHERE br.business_type = '采购'
++                AND et.amount >= 0
++                AND NOT (et.approval_level = 0 AND et.manual_entry_flag = 1)
++            mustBe: 0
+       currency:
+         type: varchar
+         maxLength: 10

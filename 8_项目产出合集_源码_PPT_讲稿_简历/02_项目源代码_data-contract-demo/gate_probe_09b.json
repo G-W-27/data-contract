@@ -1,0 +1,17 @@
+{
+  "business_type": "采购",
+  "conditions": [
+    {
+      "field": "amount",
+      "operator": ">=",
+      "value": 0
+    }
+  ],
+  "requirements": [
+    {
+      "field": "same_preparer_approver_flag",
+      "operator": "=",
+      "value": 1
+    }
+  ]
+}

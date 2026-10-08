@@ -1,0 +1,8 @@
+[
+  {
+    "rule_id": "erp_transactions.amount.q0",
+    "field": "amount",
+    "value_column": "amount",
+    "new_threshold": 8000000
+  }
+]

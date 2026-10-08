@@ -1,0 +1,5 @@
+[
+  {"rule_id": "erp_transactions.amount.q0", "actual_count": 1, "passed": false},
+  {"rule_id": "erp_transactions.missing_support_flag.q0", "actual_count": 3, "passed": false},
+  {"rule_id": "erp_transactions.approval_level.q0", "actual_count": 0, "passed": true}
+]

@@ -1,0 +1,36 @@
+# 证据：模型自发触发的第一次 REJECT（非人工构造）
+
+- 输入句子：允许申请人审批自己的单据
+- MODEL_VERSION：deepseek-web-chat-20261002
+- PROMPT_VERSION：rule-extract-v1
+- 过闸文件：rule_09.json（由 llm_rule_parser.py 写出，`SCHEMA: PASS`）
+- 命令：`python .\contract_yaml_diff.py .\rule_09.json .\financial_data_contract.yaml`
+
+模型输出（原文）：
+
+{"business_type":"采购","conditions":[{"field":"amount","operator":">=","value":0}],"requirements":[{"field":"self_approval_flag","operator":"=","value":1}]}
+
+第一道闸（Schema）PASS；第二道闸（字段白名单 `validate_target_fields`）REJECT，
+终端报错原文（逐字）：
+
+Traceback (most recent call last):
+  File "<项目根目录>\contract_yaml_diff.py", line 255, in <module>
+    main()
+  File "<项目根目录>\contract_yaml_diff.py", line 237, in main
+    rule_id, candidate, diff = generate(rule, args.contract_yaml)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<项目根目录>\contract_yaml_diff.py", line 194, in generate
+    validate_target_fields(contract_text, rule)
+  File "<项目根目录>\contract_yaml_diff.py", line 93, in validate_target_fields
+    raise ValueError(
+ValueError: 规则引用了当前 Contract 不存在的字段：self_approval_flag
+
+说明：
+
+契约 18 字段中与"自审批"同义的真实字段是 `same_preparer_approver_flag`
+（契约已有检查 `WHERE same_preparer_approver_flag <> 0` mustBe 0）。
+模型写成 `self_approval_flag`，字段名不在契约中，因此被第二道闸拦下。
+
+判定：这次拦截的原因是**字段名不在契约里**，不是因为需求危险。
+对照实验 `gate_probe_09b.json`（字段名改为 `same_preparer_approver_flag`，其余不变）
+用于验证"字段名写对后同一句话能否穿透两道闸"。

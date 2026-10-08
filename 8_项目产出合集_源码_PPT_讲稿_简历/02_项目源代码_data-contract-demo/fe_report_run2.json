@@ -1,0 +1,19 @@
+{
+  "contract_version": "1.0.0",
+  "prompt_version": "fx-v1",
+  "model_version": "deterministic-baseline",
+  "total_failures": 1,
+  "explained_categories": 1,
+  "cache_hits": 1,
+  "generated_at": "2026-10-02T04:10:31.903691+00:00",
+  "outcomes": [
+    {
+      "rule_id": "erp_transactions.amount.q0",
+      "error_signature": "mustBe=0",
+      "actual_count": 1,
+      "explanation": "【规则 erp_transactions.amount.q0】交易金额（允许负数）。该字段要求满足 mustBe=0，即不允许出现约束之外的值。当前检测到 1 条违反。这意味着存在不满足该字段业务约束的交易记录，可能对应录入错误、流程越界或系统集成偏差，应结合契约变更单（CCR）流程追溯责任人并定位根因。",
+      "cache_hit": true,
+      "source": "deterministic"
+    }
+  ]
+}

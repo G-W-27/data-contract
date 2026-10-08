@@ -1,0 +1,1 @@
+{"business_type":"采购","conditions":[{"field":"contract_risk_score","operator":">","value":80}],"requirements":[{"field":"approval_level","operator":">=","value":4}]}

@@ -1,0 +1,68 @@
+[
+  {
+    "version_id": "v1.0.0",
+    "yaml_path": "financial_data_contract.yaml",
+    "git_tag": "v1.0.0",
+    "change_request_id": "CCR00001",
+    "operator": "E001",
+    "timestamp": 1791079169.3163004,
+    "note": "",
+    "is_current": false,
+    "kind": "publish"
+  },
+  {
+    "version_id": "v1.1.0",
+    "yaml_path": "candidate_contract.yaml",
+    "git_tag": "v1.1.0",
+    "change_request_id": "CCR00002",
+    "operator": "E001",
+    "timestamp": 1791079169.4386551,
+    "note": "",
+    "is_current": false,
+    "kind": "publish"
+  },
+  {
+    "version_id": "cvr-9a97284f5b",
+    "yaml_path": "financial_data_contract.yaml",
+    "git_tag": "rollback-to-v1.0.0",
+    "change_request_id": "CCR00003",
+    "operator": "E002",
+    "timestamp": 1791079169.5614896,
+    "note": "回退自 v1.1.0 至 v1.0.0",
+    "is_current": false,
+    "kind": "rollback"
+  },
+  {
+    "version_id": "v1.0.0",
+    "yaml_path": "<项目根目录>/financial_data_contract.yaml",
+    "git_tag": "v1.0.0",
+    "change_request_id": "CCR00001",
+    "operator": "E001",
+    "timestamp": 1791079912.2688043,
+    "note": "",
+    "is_current": false,
+    "kind": "publish"
+  },
+  {
+    "version_id": "v1.1.0",
+    "yaml_path": "<项目根目录>/candidate_contract.yaml",
+    "git_tag": "v1.1.0",
+    "change_request_id": "CCR00002",
+    "operator": "E001",
+    "timestamp": 1791079912.3949718,
+    "note": "",
+    "is_current": false,
+    "kind": "publish"
+  },
+  {
+    "version_id": "cvr-4e908d4fad",
+    "yaml_path": "financial_data_contract.yaml",
+    "git_tag": "rollback-to-v1.0.0",
+    "change_request_id": "CCR00003",
+    "operator": "E002",
+    "timestamp": 1791079912.5335007,
+    "note": "回退自 v1.1.0 至 v1.0.0",
+    "is_current": true,
+    "kind": "rollback"
+  }
+]

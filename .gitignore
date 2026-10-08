@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 环境 / 密钥
+.env
+*.secret
+*.pem
+*.key
+*.p12
+config.local.*
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 测试 / 缓存
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 大数据文件（外部下载的数据集约 79MB，不入仓；项目自带的小样例保留）
+universal_enterprise_erp_fraud_dataset.parquet
+
+# Kestra 运行时产物
+kestra/*.log

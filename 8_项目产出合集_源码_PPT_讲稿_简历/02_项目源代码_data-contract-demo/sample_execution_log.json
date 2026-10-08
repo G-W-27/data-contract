@@ -1,0 +1,23 @@
+{
+  "execution_id": "kestra-exec-20261004-001",
+  "namespace": "finance.erp",
+  "flow_id": "data-contract-daily-check",
+  "started_at": "2026-10-04T01:00:00Z",
+  "ended_at": "2026-10-04T01:02:13Z",
+  "status": "FAILED",
+  "tasks": [
+    {"task_id": "extract", "state": "SUCCESS", "attempts": 1},
+    {"task_id": "datacontract-test", "state": "FAILED", "attempts": 1},
+    {"task_id": "notify", "state": "SKIPPED", "attempts": 0}
+  ],
+  "log_lines": [
+    "01:00:00 INFO  flow data-contract-daily-check triggered",
+    "01:00:01 INFO  task extract: pulled 10000 rows from erp_transactions",
+    "01:01:50 INFO  task datacontract-test: running 72 quality checks",
+    "01:01:52 ERROR datacontract-test: Quality Check amount failed: Actual custom_sql(amount) returned 1 row exceeding 5000000",
+    "01:01:53 ERROR datacontract-test: Quality Check missing_support_flag failed: 3 rows with missing support document",
+    "01:01:54 WARN  datacontract-test: 2 categories failed, incident suspected",
+    "01:02:13 ERROR flow data-contract-daily-check: execution FAILED",
+    "01:02:14 INFO  downstream notify skipped due to FAILED state"
+  ]
+}

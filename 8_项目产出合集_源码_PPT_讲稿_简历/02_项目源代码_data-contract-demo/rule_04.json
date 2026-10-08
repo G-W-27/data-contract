@@ -1,0 +1,17 @@
+{
+  "business_type": "报销",
+  "conditions": [
+    {
+      "field": "amount",
+      "operator": ">=",
+      "value": 5000000
+    }
+  ],
+  "requirements": [
+    {
+      "field": "approval_level",
+      "operator": "=",
+      "value": 4
+    }
+  ]
+}

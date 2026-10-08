@@ -1,0 +1,49 @@
+# 第七卷 ⑨ + H：Contract Copilot Evals 持续回归门禁
+#
+# 作用
+#   每次 push / PR 自动把 evals/raw 下的模型原始返回重放进两道闸门，
+#   验证「闸门行为」与「RULE_ID 内容寻址」仍然可复现。
+#   退出码非 0（出现偏差）即阻断合并，由人工复核后再改 PROMPT 或闸门。
+#
+# 约束（与 evals/README.md 一致）
+#   - 不调用模型、不联网、不连 Postgres（离线回放）。
+#   - 只依赖 pyyaml + jsonschema（run_evals.py 顶层不 import psycopg2）。
+#
+# 平移提示
+#   本文件是 GitHub Actions 形态。若仓库托管在 GitLab，等价写法是
+#   `.gitlab-ci.yml` 里的 `evals-gate:` job，脚本段完全一致：
+#     evals-gate:
+#       image: python:3.12
+#       script:
+#         - pip install pyyaml jsonschema
+#         - python evals/run_evals.py
+#   退出码语义一致（非 0 即失败，阻断 pipeline）。
+name: Contract Copilot Evals
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  evals-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "pyyaml" "jsonschema"
+
+      - name: Run Evals regression gate
+        # run_evals.py 以 SystemExit(main()) 收尾：
+        # 退出码 0 = 与取证记录完全一致；1 = 出现偏差（需人工复核）。
+        run: python evals/run_evals.py

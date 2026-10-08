@@ -1,0 +1,10 @@
+[
+  {"transaction_id": "T001", "rule_id": "erp_transactions.amount.q0", "status": "FAIL"},
+  {"transaction_id": "T002", "rule_id": "erp_transactions.amount.q0", "status": "PASS"},
+  {"transaction_id": "T003", "rule_id": "erp_transactions.amount.q0", "status": "PASS"},
+  {"transaction_id": "T004", "rule_id": "erp_transactions.amount.q0", "status": "PASS"},
+  {"transaction_id": "T005", "rule_id": "erp_transactions.amount.q0", "status": "PASS"},
+  {"transaction_id": "T006", "rule_id": "erp_transactions.amount.q0", "status": "PASS"},
+  {"transaction_id": "T003", "rule_id": "erp_transactions.approval_level.q0", "status": "FAIL"},
+  {"transaction_id": "T004", "rule_id": "erp_transactions.approval_level.q0", "status": "PASS"}
+]

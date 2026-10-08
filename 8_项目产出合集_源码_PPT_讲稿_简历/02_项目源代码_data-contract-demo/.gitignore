@@ -1,0 +1,29 @@
+# 演示数据（仿真 ERP 环境生成，不入库）
+*.parquet
+*.csv.tmp
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 虚拟环境
+.venv/
+venv/
+
+# 日志
+*.log
+
+# Kestra / Docker 运行时产物（独立子项目，不纳入本 demo 仓库）
+kestra/
+
+# 本地密钥 / 环境变量（如含真实凭据）
+.env
+*.secret
+
+# IDE 配置（与个人环境绑定，不入库）
+.idea/
+.vscode/
+
+# 已废弃的历史备份（命名中的"废"即作废标记，保留在磁盘但不入库）
+financial_data_contract_86_backup(废).yaml

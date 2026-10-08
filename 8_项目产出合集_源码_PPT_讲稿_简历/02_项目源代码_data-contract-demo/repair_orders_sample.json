@@ -1,0 +1,29 @@
+{
+  "contract_version": "1.0.0",
+  "total_categories": 2,
+  "located_rows": 2,
+  "orders": [
+    {
+      "failure_rule": "amount",
+      "transaction_id": "TRX10024",
+      "source_request": "REQ10024",
+      "requester": "E023",
+      "reason": "交易金额绝对值超过契约约定的 500 万上限",
+      "suggestion": "核实该笔交易金额是否录入错误或超出授权额度，修正后重新执行契约检查",
+      "located": true,
+      "actual_count": 1
+    },
+    {
+      "failure_rule": "missing_support_flag",
+      "transaction_id": "TRX10025",
+      "source_request": "REQ10025",
+      "requester": "E024",
+      "reason": "存在缺少支持性凭证的记录（契约要求为 0）",
+      "suggestion": "补充支持性凭证后重新检查",
+      "located": true,
+      "actual_count": 1
+    }
+  ],
+  "execution_id": "E-demo-001",
+  "_note": "本样例由内存 SQLite（镜像 erp_transactions 视图 + journal_entries）注入真实脏数据驱动，验证确定性定位与固定模板；生产路径 same 代码由 Postgres 执行 build_locate_sql。"
+}

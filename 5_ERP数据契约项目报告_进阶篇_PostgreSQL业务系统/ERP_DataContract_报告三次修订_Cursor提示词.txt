@@ -1,0 +1,821 @@
+ERP 数据契约项目报告「PostgreSQL 业务系统 + 数据生成器 + Data Contract + Pytest + Streamlit + Kestra」四卷最终校对、补写、结构化精进版
+0. 使用说明：这不是普通润色任务，而是“最终验收 + 修订任务”
+你现在不是重新写一份项目报告，也不是单纯润色现有四卷。
+你的任务是：
+拿着用户的原始对话实录 项目一_进阶篇_自己造数据.txt、当前四卷报告、旧版提示词，逐条核对事实、时间线、代码、命令、输出、概念解释、思维导图、表格、架构图和前后逻辑，然后对当前四卷进行最终修订。
+这次修订的目标不是“字更漂亮”，而是：
+让这四卷真正做到：信息完整、逻辑清晰、技术准确、结构可视化、前后自洽、事实边界清楚、能看懂、能复现、能经得住面试官逐句追问。
+最重要的一句话
+我不怕篇幅多。
+不要为了控制字数而：
+把完整过程压成几句话；
+把原 txt 中的表格改写成散文；
+把原 txt 中的思维导图改成一大段文字；
+合并多个版本；
+省略报错；
+省略代码；
+省略终端输出；
+把多个概念塞进一个段落；
+用一句“最终解决了”代替真实过程。
+本次优先级必须是：
+全面 > 逻辑清晰 > 好理解 > 事实准确 > 结构完整 > 篇幅控制
+只要内容真实、有助于理解，就可以长。
+
+1. 本次修订的最高标准
+最终报告必须满足四个标准：
+标准 A：事实标准
+所有真实执行过的内容必须保留。
+所有只讨论过、计划过、未来准备做的内容，必须标注：
+“设计设想 / 后续规划 / 尚未实现”
+绝不能把讨论中的功能写成已经上线。
+标准 B：时间线标准
+任何东西都不能“拿最终结果倒推早期状态”。
+尤其必须严格区分：
+Parquet 阶段 25 ↓ 28 ↓ 34  PostgreSQL 阶段 55 ↓ 63 ↓ 72 
+以及：
+12 条手工样本 ↓ 22 条 ↓ 10,022 条 
+以及：
+版本1 ↓ 版本2 ↓ 版本3 ↓ 版本4 ↓ 版本5 ↓ 版本6：异常注入 FAIL ↓ 版本7：恢复基线 
+标准 C：理解标准
+这不是技术流水账。
+读者必须能看懂：
+为什么做这一步？
+它解决前一步什么问题？
+它为什么成为下一步的前提？
+这个技术概念到底是什么意思？
+这个数据库字段在业务上代表什么？
+这张表与哪张表发生关系？
+这条 Contract 规则为什么存在？
+因此：
+大段文字不是越多越好。
+对于能用表格或图解释清楚的内容，必须使用表格或图。
+标准 D：面试标准
+每个关键实现必须能够回答：
+你为什么这么设计？
+还有没有其他方案？
+为什么不选另外一种？
+这个错误怎么定位的？
+数据到底存在哪里？
+谁执行 Contract？
+Kestra 和 Contract 什么关系？
+生成器是不是在模拟真正 ERP？
+Pytest 和 Data Contract 为什么不重复？
+Dashboard 为什么不能只读 JSON？
+LLM 到底能不能直接修改生产规则？
+最终四卷必须做到：
+面试官顺着报告任何一个技术点往下追问，我都能在报告中找到对应的解释、代码、结构图或事实证据。
+2. 原始材料的优先级
+严格按照以下优先级：
+第一事实来源
+用户原始实录：
+项目一_进阶篇_自己造数据.txt
+这是所有新增事实、代码、输出、错误、讨论过程、设计演变的最高事实来源。
+第二事实来源
+当前已经生成的四卷报告。
+它们用于：
+判断哪些内容已经写入；
+检查有没有前后不一致；
+找出哪些内容已经存在但写得过度压缩；
+找出哪些内容和原 txt 相互矛盾。
+第三来源
+旧四份报告。
+旧报告主要用于：
+语言风格；
+排版习惯；
+“思路讨论 → 具体操作 → 闭环小结”的叙事风格；
+技术概念解释方式。
+旧报告不能覆盖真实实录。
+3. 极其重要：不要把“原 txt 有”误判成“报告已经完成”
+这是本次修订最重要的规则之一。
+以后做检查时：
+如果原 txt 里出现：
+一个表格 
+而报告只是：
+“文字描述了这个表的内容。”
+必须判定：
+没有完整完成。
+如果原 txt 里出现：
+一个 ASCII 架构图 
+而报告变成：
+“一段文字解释了架构。”
+也必须判定：
+没有完整完成。
+如果原 txt 里出现：
+问题 ↓ 解释 ↓ 工程意义 
+而报告只有：
+“顺带提了一句。”
+也必须判定：
+没有完成。
+4. 一个问题必须满足什么条件，才能算“已完成”
+以后 A1～H46 每一个问题，都必须满足以下条件：
+① 有问题背景
+为什么用户会提出这个问题？
+② 有认知障碍
+用户到底误解了什么？
+③ 有 AI 解释 / 项目解释
+当时是怎么解释的？
+④ 有工程含义
+这个问题在整个项目里面意味着什么？
+⑤ 有具体证据
+能提供命令、SQL、代码、输出、表格、流程图时必须提供。
+⑥ 有闭环
+必须用：
+因为…… → 所以…… → 结果……
+把问题收住。
+⑦ 有结构化表达时，优先结构化表达
+适合表格就表格。
+适合流程图就流程图。
+适合架构图就架构图。
+适合时间线就时间线。
+不要把所有东西都变成长段文字。
+5. “思路讨论”仍然必须保留，但不能机械化
+每个正式小节仍然采用：
+思路讨论  具体操作  闭环小结 
+但是：
+禁止把“思路讨论”写成机械的“第一、第二、第三、第四”。
+必须使用第一人称自然叙事。
+例如：
+我当时并不是一开始就决定采用 PostgreSQL。我先发现原来的 Parquet 数据虽然已经足够让 Contract 跑起来，但它实际上没有提供真正的业务数据产生源头……
+“思路讨论”的目的不是灌水。
+而是解释：
+决策为什么发生。
+6. 本次必须新增：全文最前面的“总体思路总览”
+当前四卷最明显的结构缺陷之一，是全文一开始没有一个真正的总蓝图。
+必须在新四卷开头增加：
+7. 本阶段总体思路
+必须用第一人称完整讲完整个阶段：
+原有 Data Contract 项目         ↓ 原来依赖 Parquet / 静态数据         ↓ 发现缺少业务数据产生源头         ↓ 建立 PostgreSQL / erp_demo         ↓ employees projects approval_policies         ↓ business_requests         ↓ approval_records         ↓ journal_entries         ↓ erp_transactions         ↓ financial_data_contract.yaml         ↓ datacontract ci         ↓ Kestra         ↓ Pytest         ↓ Streamlit Dashboard 
+然后明确拆成：
+           整体系统                      │         ┌────────────┴────────────┐         ↓                         ↓    业务数据生产线               数据治理线         ↓                         ↓ 员工/项目/审批规则           Data Contract         ↓                         ↓ 申请/审批/财务事实           Kestra         ↓                         ↓ erp_transactions             Pytest         ↓                         ↓         └───────────┬─────────────┘                     ↓              Streamlit Dashboard
+
+必须解释：
+这不是“单纯把数据库换成 PostgreSQL”。
+而是：
+从“对现成数据做质量检查”的原型，升级到“有业务数据产生源头、可规模化生成、可自动校验、可持续监控”的数据质量工程链路。
+7. 本次修订的“绝对禁止事项”
+禁止 1：不允许把模拟数据写成真实生产数据
+必须使用：
+模拟 ERP 业务数据
+10,000+ 条模拟交易
+不要写：
+真实 ERP 生产数据
+禁止 2：不允许把生成器写成真实 ERP 工作流
+真实生成器做的是：
+读取员工/项目/审批政策 ↓ 按规则随机组合 ↓ 生成业务申请 ↓ 生成审批记录 ↓ 生成财务事实 ↓ View 汇总 
+它模拟的是：
+已经走到终态的一批业务数据。
+它并没有实现：
+员工登录 ↓ 员工填写 ↓ 点击提交 ↓ 真人审批 ↓ 审批通过 ↓ 真实 ERP 自动落账 
+所有报告必须明确这一边界。
+8. 必须修正的事实问题一：approval_level
+当前卷二仍有：
+“第二族是 9 个 0/1 标志位……”
+这是错误的。
+必须统一修改为：
+8 个 0/1 标志位：
+manual_entry_flag
+is_round_amount
+high_value_flag
+same_preparer_approver_flag
+missing_support_flag
+approval_below_expected_flag
+near_approval_threshold_flag
+manual_after_hours_flag
+approval_level 单独属于 1～4 的审批层级字段。
+不能再把 approval_level 和 0/1 flag 混为一谈。
+9. 必须修正的事实问题二：生成器最终到底用什么技术
+最终真实落地：
+generate_demo_data.py + psycopg2 + execute_values + page_size=1000 + 事务 commit / rollback 
+必须明确：
+最终实际采用的是 psycopg2 + execute_values。
+不要把：
+pandas + SQLAlchemy + df.to_sql + chunksize 
+继续写成最终实现。
+如果需要介绍这些方案：
+必须标注为“前期讨论过的备选方案”。
+10. 必须修正的事实问题三：不要再把 chunksize 和 page_size 混为一谈
+最终代码实际是：
+execute_values(     cursor,     sql,     rows,     page_size=1000, ) 
+必须解释：
+execute_values 是批量 INSERT 工具。
+page_size=1000 控制每次多值 INSERT 拼接多少行。
+page_size 不是事务提交次数。
+本项目的事务边界是：三张表全部写入成功后统一 commit()；任一步失败则 rollback()。
+11. 必须修正的事实问题四：不能写“100 万行数据已经成功灌入”
+真实最终数据量：
+12 ↓ 22 ↓ 10,022 
+最终必须写：
+10,000+ 条模拟交易，最终实测 10,022 笔。
+“100 万行”只能出现：
+前期讨论 / 预想中的规模测试
+如果原实录中确实出现过“100 万行”的讨论，也必须明确是：
+当时讨论的未来规模，不是最终已实现结果。
+12. 必须修正的事实问题五：固定随机种子
+真实最终生成器：
+RANDOM_SEED = 20260923 
+而不是：
+20260922 
+同时不能写：
+seed 一样 → 数据库每次完全一样。
+必须写成：
+固定随机种子可以让随机选择过程具有可重复性，但最终数据库结果还取决于代码版本、员工/项目/审批政策主数据、当前数据库起始状态及运行环境。
+特别是这个生成器：
+是基于当前数据库已有最大 Request 编号继续追加生成的。
+所以绝不能写：
+“重复执行一定得到完全相同的数据库”。
+13. 必须修正的事实问题六：healthcheck
+不能再写：
+pg_isready 能证明 Kestra 一定连接成功。
+应该写：
+healthcheck: pg_isready 用于检查 PostgreSQL 服务是否已经 ready。
+然后：
+Kestra 任务是否真正能够连接业务数据库并执行 Data Contract，还要由任务实际连接过程和 datacontract ci 的执行结果确认。
+另外不要再说：
+“宿主机和容器走的是同一条网络通道”。
+改成：
+宿主机通过 localhost:5432 访问端口映射；Kestra Task 容器通过 Docker Compose 服务名 postgres:5432 访问同一个 PostgreSQL 服务。
+14. 必须修正的事实问题七：risk_class
+真实生成器代码是：
+high_value_flag = 1 if amount >= 500000 else 0  if high_value_flag == 1:     risk_class = "MEDIUM" else:     risk_class = "LOW" 
+因此正常生成器实际产生：
+LOW MEDIUM 
+不会自动生成 HIGH。
+必须统一表述为：
+正常数据生成器根据金额阈值产生 LOW / MEDIUM；HIGH 作为高风险等级存在，并在异常重算逻辑中用于表达内控异常。最终基线数据实测 HIGH = 0。
+不要再写：
+“正常生成器自动打 LOW/MEDIUM/HIGH 三档风险”。
+15. 必须修正的事实问题八：CLI 版本
+必须区分：
+本机： datacontract-cli 1.2.0  Kestra Task： 实际运行环境为 1.2.1 
+因此最终验收不能写成：
+“项目当前 CLI 统一为 1.2.1”。
+应该写：
+最终基线为 72/72/0 PASS；本机 CLI 为 1.2.0，Kestra Task 实际运行环境为 1.2.1。
+16. 必须修正的事实问题九：Dashboard 的 Contract 执行
+必须明确：
+Streamlit ≠ Kestra 
+Dashboard 的 Contract 执行与 Kestra 每日定时执行，是：
+两个独立的执行过程。
+两者共享：
+同一套 Contract 规则逻辑。
+但不是：
+同一次 execution。
+Dashboard 当前行为必须描述为：
+当前 Streamlit 会话首次加载 ↓ 独立执行 datacontract ci ↓ 结果用于当前页面展示 
+并且：
+st.session_state 
+用于避免普通 rerun 时无休止重复执行。
+如果有手动重新执行按钮，也必须写清。
+17. 必须修正的事实问题十：Dashboard “实时”表述
+禁止：
+实时推送
+实时同步
+数据一变页面立即变化
+因为当前没有 WebSocket、没有后台实时推送。
+应该写：
+Dashboard 在页面加载或用户主动刷新时查询 PostgreSQL 当前状态。
+因此它是：
+按需查询最新数据库状态
+不是严格意义上的：
+实时流式监控。
+18. 必须修正的事实问题十一：恢复异常后不要伪造第二次 PASS
+异常流程严格写成：
+正常基线 ↓ 注入 5 类异常 ↓ Contract FAIL ↓ 恢复 5 条交易 ↓ 数据库异常计数恢复为 0 ↓ 回到干净基线 
+不要写成：
+恢复 ↓ 再次 Contract ↓ PASS 
+除非原始实录中确实存在第二次 datacontract ci 的 PASS 终端输出。
+用户明确要求：
+不要虚构第二次 FAIL → 修复 → PASS 演示。
+19. 必须修正的事实问题十二：Pytest
+真实 Pytest：
+5 passed in 2.84s 
+测试：
+test_database_connection test_transaction_volume test_core_columns_exist test_risk_flags_clean test_data_contract 
+其中：
+test_risk_flags_clean 
+实际上检查 5 类关键风险条件：
+same_preparer_approver missing_support approval_below near_threshold amount_over_limit 
+所以不要再写：
+“4 类风险”。
+此外：
+2.84 秒是本次运行的实测耗时。
+不要写：
+“以后永远 3 秒内完成”。
+20. 55 → 72 的正确时间线必须单独做表
+正文必须保留这张表：
+阶段检查数构成Parquet 初始258 字段 × 3 + transaction_id 唯一Parquet 加 1 字段2825 + 1 字段 × 3Parquet 再加 2 字段3428 + 2 字段 × 3PostgreSQL 对齐后5518 字段 × 3 + transaction_id 唯一PostgreSQL + maxLength / 已生效 SQL6355 + 5 maxLength + 3 SQL最终业务规则7255 + 5 maxLength + 12 SQL
+必须解释：
+72 是 Contract 实际执行生成的 checks 数。
+不是：
+数据库里有 72 条规则。
+规则本体存在于：
+financial_data_contract.yaml 
+数据库提供：
+erp_transactions 
+作为被检查的数据接口。
+21. 本次必须恢复原 txt 中的结构化信息
+下面这些内容，不能再只写成长段文字。
+22. 必须新增表格一：6 张表 + View 总览
+位置：
+卷一，6 表 + View 设计逻辑开始位置。
+表：
+对象类型角色负责回答的问题employeesTable员工主数据谁在做事projectsTable项目主数据事情属于哪个项目approval_policiesTable审批规则多少钱需要几级审批business_requestsTable业务申请员工申请了什么approval_recordsTable审批记录谁审批、是否合规journal_entriesTable财务事实最终形成什么财务交易erp_transactionsView契约接口Data Contract 实际检查什么
+23. 必须新增图一：6 表数据血缘图
+放卷一前半部分。
+建议：
+employees ─────────┐ projects ──────────┤ approval_policies ─┤                    ↓           business_requests                    ↓           approval_records                    ↓            journal_entries                    ↓           erp_transactions                    ↓       financial_data_contract 
+同时解释：
+erp_transactions 是契约接口，不是底层事实表。
+24. 必须新增表格二：原 Contract 字段如何在新系统中产生
+原 txt 已经出现这个思路。
+必须恢复成表格。
+至少包含：
+Contract 字段数据来源谁/什么产生是否允许普通员工直接修改transaction_idjournal_entries系统生成否erp_systemjournal_entries系统否posting_datetimejournal_entries系统否amountbusiness_requests员工填写是currencybusiness_requests下拉是gl_accountapproval_policies根据规则产生否risk_classjournal_entries系统计算否approval_levelapproval_records审批级别快照否same_preparer_approver_flagjournal_entries比较业务事实否missing_support_flagjournal_entries支持性文件状态否approval_below_expected_flagjournal_entries比较 approver level / required level否near_approval_threshold_flagjournal_entries根据阈值计算否............
+完整字段必须以原实录为准。
+25. 必须新增表格三：employees 字段与权限
+放卷一 employees。
+至少包含：
+字段中文含义来源普通员工能否修改employee_id员工编号系统否employee_name员工姓名员工主数据否department所属部门员工主数据否position职位员工主数据否employee_level员工级别员工主数据 / 管理维护否username登录账号系统否password_hash密码哈希系统否is_active是否启用系统/管理员否
+必须解释：
+employee_level 是主数据，不是员工自己填写的申请字段。
+26. 必须新增表格四：business_requests 的字段输入方式
+放卷一 business_requests 后。
+分成：
+系统自动生成 ↓ 数据库驱动下拉 ↓ 员工自行填写 ↓ 系统后续计算 
+至少体现：
+系统自动
+request_id requester_id request_status submitted_at updated_at 
+下拉选择
+business_type category project_id currency 
+员工填写
+request_title request_description amount support_document_flag 
+27. 必须新增图二：新建业务申请页面结构图
+放卷四未来 ERP 设计部分。
+新建业务申请  ① 系统信息 request_id requester status 时间  ② 业务选择 业务类型 ▼ 业务类别 ▼ 项目 ▼ 币种 ▼  ③ 员工填写 标题 说明 金额 支持性文件  ④ 系统计算 required_level approver risk flags 
+必须说明：
+这是未来 ERP 前台设计，不是当前已经实现的页面。
+28. 必须新增表格五：approval_policies
+至少体现：
+business_typecategorymin_amountmax_amountrequired_levelnear_threshold_amountgl_account
+并紧跟解释：
+业务类型 + 业务类别 + 金额 ↓ approval_policies ↓ required_level ↓ 选择合格审批人 
+特别解释：
+当前生成器是先随机选择 policy，再围绕 policy 生成自洽数据。
+而：
+未来真实业务前台才是员工输入业务类型/类别/金额后，由系统查询 approval_policies。
+两者必须分开。
+29. 必须新增表格六：approval_records
+至少包含：
+字段业务含义approval_id审批记录编号request_id对应业务申请policy_id对应审批规则approver_id审批人approver_level_snapshot审批发生时的级别required_level当时规则要求的级别approval_status审批状态same_preparer_approver_flag是否制单审批同人approval_below_expected_flag是否审批级别不足near_approval_threshold_flag是否接近审批阈值approved_at审批时间
+必须重点解释：
+为什么要保存 approver_level_snapshot。
+因为历史审批必须保持历史真实性，即便员工以后升职。
+30. 必须新增图三：员工 A / B 审批关系示意
+使用原 txt 里的具体例子，但不得写成当前已经实现的 ERP 页面。
+建议：
+B 登录 ↓ employee_level = 3 ↓ B 提交 180,000 业务申请 ↓ 查询 approval_policies ↓ required_level = 3 ↓ 寻找 employee_level >= 3 且不是 B 的员工 ↓ A = 4级 ↓ approval_records ↓ 4 >= 3 ↓ approval_below_expected_flag = 0 
+必须解释：
+这就是未来真实业务系统中的“员工身份 → 审批规则 → 审批人”关系。
+31. 必须新增图四：PowerShell / psql / PostgreSQL 层次
+放卷一 erp_demo。
+表格：
+提示符环境能干什么PS C:...>PowerShelldocker、文件、路径、环境变量postgres=#psqlPostgreSQL 管理erp_demo=#psql 当前数据库建表、查询、INSERT、\dt、\dv
+必须解释：
+\d 是 psql 元命令，不是 PowerShell 命令。
+32. 必须新增图五：数据库到底“在哪里”
+VSCode = 写 SQL 文本  PowerShell = 调用 docker / psql  Docker = 提供运行 PostgreSQL 的容器环境  PostgreSQL = 真正存储 Database / Schema / Table / View  erp_demo.public = employees / projects / ... 
+必须强调：
+.sql 文件不是数据库。
+Docker Desktop 的 Containers / Volumes 也不是 PostgreSQL 的 Table 浏览器。
+33. 必须新增表格七：Docker / PostgreSQL / Kestra / Streamlit 职责
+组件它是什么它负责什么Docker容器运行环境跑 PostgreSQL / KestraPostgreSQL数据库服务器存业务数据Kestra工作流编排平台定时执行任务Data Contract质量规则定义检查什么Pytest自动化测试框架做项目回归StreamlitWeb 展示层把结果展示给人
+34. 必须新增图六：Docker / PostgreSQL / Dashboard 三层
+Docker └── PostgreSQL Container       └── PostgreSQL Server             └── erp_demo                   ├── 6 Tables                   └── 1 View                         ↓                  Data Contract                         ↓                  Streamlit 
+必须避免把 Docker 说成“数据库”。
+35. 必须新增图七：YAML 到 PostgreSQL 的真正执行链
+financial_data_contract.yaml         ↓ datacontract ci         ↓ 读取 servers / models / fields / quality         ↓ 连接 PostgreSQL         ↓ 访问 erp_transactions         ↓ 执行字段检查         ↓ 执行 SQL quality rules         ↓ 汇总结果         ↓ PASS / FAIL 
+这是 B7 最重要的可视化解释。
+36. 必须新增图八：Kestra 与 Contract
+                    financial_data_contract.yaml                                │                   ┌────────────┴────────────┐                   ↓                         ↓             本地执行                    Kestra 执行                   ↓                         ↓         本机 localhost:5432        Task 容器 postgres:5432                   ↓                         ↓          手动 datacontract ci       每日 06:00 自动执行                   │                         │                   ↓                         ↓                结果                      结果                                             ↓                                         失败 → DingTalk 
+必须强调：
+两条线使用同一套 Contract 规则主体，但执行环境不同。
+37. 必须新增表格八：本地 Contract 与 Kestra Contract
+项目本地Kestra文件本地 financial_data_contract.yamlNamespace Files 中的 financial_data_contract.yaml运行环境WindowsDocker TaskHostlocalhostpostgresPort54325432Databaseerp_demoerp_demo规则主体必须一致必须一致用途本地手动测试 / Dashboard定时自动执行
+必须解释：
+host 可以不同，因为运行位置不同。
+规则定义不能不同。
+38. 必须新增表格九：55 → 72 Rule Inventory
+不要求把所有 72 行都堆在正文，但必须至少分组展示。
+例如：
+类别主要检查Schema字段存在Typevarchar / integer / numeric / timestampNullability必填字段Uniquenesstransaction_idLength5 个 maxLengthBusiness SQLamountBusiness SQLmanual_entry_flagBusiness SQLapproval_levelBusiness SQLis_round_amountBusiness SQLhigh_value_flagBusiness SQLposting_hourBusiness SQLposting_dayofweekRisk SQLsame_preparer_approver_flagRisk SQLmissing_support_flagRisk SQLapproval_below_expected_flagRisk SQLnear_approval_threshold_flagRisk SQLmanual_after_hours_flag
+39. 必须新增图九：生成器五步工作流程
+
+1. 连接 PostgreSQL         ↓ 2. 读取 employees / projects / approval_policies         ↓ 3. 随机选择 policy / requester / project         ↓ 4. 生成安全金额 / 时间 / 审批人         ↓ 5. 批量写入三张业务表         ↓ journal_entries         ↓ erp_transactions 
+其中审批人选择再展开：
+required_level ↓ 找 exact level 且 ≠ requester ↓ 没有则找更高 level ↓ 都没有 → RuntimeError
+2. 必须新增图十：数据规模演进
+12 条手工数据       ↓ 22 条       ↓ --count 10 冒烟测试       ↓ 修复代码       ↓ --count 10000       ↓ 10,022 笔 
+必须解释：
+12 条不是“最终规模”，而是最小闭环验证样本。
+10 条是冒烟测试。
+10,000 是规模化模拟。
+3. 必须新增表格十：数据生成器版本演进
+严格：
+版本做了什么结果V1手工 12 条建立最小业务链V2初版生成器 + --count 10发现缺包/字段问题V3修 status → project_status项目读取正常V4修 approval_records boolean类型匹配V5--count 1000010,022 笔V6注入 5 类异常Contract FAILV7恢复基线五项异常计数归零
+禁止把 V6 写成“72 PASS”。
+4. 必须新增表格十一：5 类异常注入映射
+交易修改字段修改值触发规则TXN-REQ10008same_preparer_approver_flag1同人审批TXN-REQ10009missing_support_flag1缺支持文件TXN-REQ10010approval_below_expected_flag1审批级别不足TXN-REQ10011near_approval_threshold_flag1接近阈值TXN-REQ10012amount6000000金额超 500 万
+5. 必须新增图十一：异常验证链
+干净基线    ↓ 确认 5 条交易现状全为 0    ↓ BEGIN    ↓ 注入 5 类异常    ↓ COMMIT    ↓ datacontract ci    ↓ FAIL    ↓ 确认 5 项规则各自 was 1    ↓ 恢复数据    ↓ 异常计数归零    ↓ 干净基线
+
+注意：
+恢复后不虚构第二次 PASS。
+44. 必须新增表格十二：Pytest 五项职责
+测试检查什么为什么不是 Data Contract 自己做test_database_connection数据库可连接项目基础设施test_transaction_volume≥ 10,000防止数据规模异常test_core_columns_exist18 字段回归测试test_risk_flags_clean5 类关键风险基线检查test_data_contract真正调用 datacontract ci验证 Contract 执行链
+45. 必须新增图十二：Data Contract vs Pytest
+Data Contract = “数据本身合不合格？”              VS  Pytest = “这个项目整体有没有被改坏？” 
+再详细：
+Data Contract ├── Schema ├── Type ├── Null ├── Unique ├── Length └── Business Rules  Pytest ├── DB Connection ├── Data Volume ├── Core Columns ├── Risk Baseline └── Real Contract Execution 
+46. 必须新增表格十三：Dashboard V1 / V2 / V3
+版本数据来源能展示什么问题V1JSON旧 Contract 结果数据是快照、英文V2PostgreSQL交易数量、金额、风险Contract 结果可能来自旧 JSONV3PostgreSQL + 独立 Contract 执行最新 DB 状态 + 当前 Contract最终版本
+V3 必须明确：
+当前 Streamlit 会话首次加载时独立运行 Contract。
+普通 rerun 不会无限重复执行，因为使用 st.session_state。
+47. 必须新增图十三：Dashboard 数据流
+PostgreSQL    ↓ SELECT 当前交易数据    ↓ Streamlit    ├── KPI    ├── 风险分布    ├── 最近交易    └── Contract 状态 
+旁边单独：
+financial_data_contract.yaml           ↓ datacontract ci           ↓ Contract 结果           ↓ Streamlit 页面展示 
+强调：
+Streamlit 是展示层，不是数据源。
+48. 必须新增图十四：Dashboard / Kestra 双执行
+              financial_data_contract.yaml                          │               ┌──────────┴──────────┐               ↓                     ↓          Kestra 06:00           Streamlit 页面               ↓                     ↓       自动执行 Contract        独立执行 Contract               ↓                     ↓         FAIL → DingTalk        当前页面展示 
+必须明确：
+不是同一次运行。
+49. 必须新增表格十四：数据库开发者视角 vs 业务员工视角
+开发/数据人员普通员工employee_id员工姓名requester_id申请人project_id项目名称approval_level审批级别SQL 字段业务语言password_hash禁止展示risk flag仅展示业务化解释
+重点解释：
+数据库可视化 ≠ 把底层数据库字段全部暴露给员工。
+50. 必须新增表格十五：企业变更治理
+必须恢复原 txt 的这张结构：
+事情谁提出谁审批谁真正执行修改员工级别HR / 业务负责人主管 / HR 等HR 系统 / 授权角色修改审批规则财务 / 业务负责人财务负责人等系统配置角色 / 技术人员修改 Data Contract数据负责人 / 业务方Data Owner / 相关负责人技术人员通过代码/配置发布新增 ContractData Owner + 技术团队相关负责人技术团队发布
+注意：
+这是企业级未来设计，不是当前系统已经实现的审批平台。
+51. 必须新增图十五：Contract 变更治理流程
+业务需求    ↓ Change Request    ↓ 业务负责人确认    ↓ 权限审批    ↓ Contract 草稿    ↓ Lint    ↓ 自动测试    ↓ 影响分析    ↓ Code Review / Pull Request    ↓ 发布    ↓ Kestra 生效    ↓ 审计记录 
+52. 必须新增图十六：未来 ERP 两个“世界”
+原 txt 中已经明确形成两个世界。
+必须写：
+             PostgreSQL                   │       ┌───────────┴───────────┐       ↓                       ↓    ERP 业务世界              数据治理世界       ↓                       ↓    登录/申请                 Data Contract       ↓                       ↓  business_requests          72 checks       ↓                       ↓  approval_records           Kestra       ↓                       ↓  journal_entries            DingTalk       ↓  erp_transactions       └───────────┬───────────┘                   ↓             Quality Dashboard 
+必须强调：
+当前已经实现的是右侧数据治理链路和用于模拟数据生产的生成器。
+左侧真正的 ERP 登录 / 表单 / 真人审批属于未来设计。
+53. H42～H46 必须彻底拆开，不允许再合并成一大段
+必须单独写：
+H42：自然语言 → YAML Contract
+必须回答：
+用户为什么提出这个想法？
+为什么业务人员不应该手写 YAML？
+LLM 负责什么？
+Python/规则引擎负责什么？
+如何避免 LLM 自由拼 YAML？
+如何做 schema validation？
+为什么不能生成后立即上线？
+如何经过法务 / CFO / CEO？
+最后怎样进入 Git / CI / Kestra？
+建议图：
+财务自然语言 ↓ LLM ↓ 结构化 Rule JSON ↓ 确定性 Python ↓ 标准 YAML ↓ Lint ↓ Test ↓ Approval ↓ Publish ↓ Kestra 
+明确：
+当前未实现。
+54. H43：Contract 变更审批
+必须单独解释：
+Change Request ↓ 业务 Owner ↓ 审批 ↓ Contract Version ↓ 自动测试 ↓ 影响分析 ↓ 发布 
+建议表：
+对象角色Business Owner提需求Finance / Data Owner业务审核Legal合规CFO财务审批CEO最终审批Technical Team技术实施Git版本留痕CI自动验证Kestra生效执行
+明确：
+这是未来架构。
+55. H44：Incident Copilot
+必须单独写。
+Kestra 日志 + Contract YAML + 失败样本 ↓ LLM ↓ 事故报告草稿 ├── 事故编号 ├── 失败规则 ├── 影响范围 ├── 失败样本 ├── 已确认原因 ├── 推测原因 └── 修复建议 
+必须特别强调：
+LLM 不可以把推测原因当成事实。
+56. H45：NL2SQL
+必须单独写：
+自然语言问题 ↓ LLM 生成 SQL ↓ SQL AST 检查 ↓ 只允许 SELECT / WITH ↓ 表 / 字段白名单 ↓ LIMIT ↓ 超时 ↓ 只读账号 ↓ 执行 ↓ 结果 ↓ 图表 
+必须写明：
+LLM 只生成候选 SQL。
+安全检查器决定是否允许执行。
+数据库账号必须只读。
+禁止多语句。
+57. H46：PII / 财务敏感度识别
+必须单独写：
+表名 + 列名 + 字段注释 + 样本 ↓ LLM 分类建议 ↓ 个人信息 财务敏感 极敏感 内部 公开 ↓ 人工审核 ↓ 确定性 masking policy ↓ 系统执行 
+必须强调：
+LLM 给“分类建议”。
+不能直接决定权限。
+不能直接执行脱敏策略。
+58. 必须新增表格十六：PII / 财务敏感数据分类示例
+至少包含：
+表字段分类建议employeesemployee_name个人信息部分脱敏employeesusername个人信息不对外展示employeespassword_hash极敏感禁止展示journal_entriesamount财务敏感权限控制journal_entriesgl_account财务敏感权限控制projectsproject_name内部业务权限
+59. 必须新增图十七：LLM 总体架构
+                         ERP 企业系统                               │                 ┌─────────────┴─────────────┐                 ↓                           ↓              员工端                       管理端                 │                           │              登录/申请                     数据治理                 │                           │                 ↓                           ↓             PostgreSQL                 Data Contract                 │                           │                 ↓                           ↓              业务交易                    72 Checks                 │                           │                 └────────────┬──────────────┘                              ↓                         LLM Copilot                              │         ┌────────────────────┼────────────────────┐         ↓                    ↓                    ↓  Contract Copilot      Incident Copilot       SQL Copilot         │                    │                    │   自然语言→规则            日志→事故报告           问题→SQL         │                    │                    │   审批/版本/发布             修复建议                图表         │    法务→CFO→CEO         ↓  Contract Publish         ↓       Kestra         ↓       DingTalk 
+另外单独：
+LLM Data Classification         ↓ PII / 财务敏感 / 内部 / 公开         ↓ Masking Policy 
+60. 必须新增图十八：LLM 权限边界
+必须明确：
+LLM = Brain 负责： 理解 生成 解释  Python / Rule Engine = Guard 负责： 校验 权限 安全 确定性处理  PostgreSQL = Data Store 负责： 真实数据  Data Contract = Quality Gate 负责： 规则验证  Kestra = Executor 负责： 定时执行  DingTalk = Alert 负责： 通知 
+最终明确：
+LLM ≠ 数据库管理员
+LLM ≠ 最终审批者
+LLM ≠ 发布者
+61. 必须新增表格十七：当前实现 vs 未来规划
+这一张必须作为卷四 6.2 的核心表。
+能力当前状态证据PostgreSQL 业务数据底座已实现6 表 + 1 View模拟数据生成器已实现10,022 笔Data Contract已实现72 checks异常注入验证已实现5 类异常 FAILPytest已实现5 passedKestra已实现每日 06:00DingTalk已实现失败告警Streamlit Dashboard已实现中文 DashboardERP 员工登录未实现后续规划ERP 新建申请页面未实现后续规划真实审批工作流未实现后续规划RBAC未实现后续规划LLM Contract Copilot未实现后续规划Incident Copilot未实现后续规划NL2SQL未实现后续规划PII 自动分类与脱敏未实现后续规划
+62. 必须重新检查所有“真实量级 / 真实业务 / 生产级”措辞
+以下词汇必须严格处理：
+可以说
+生产级思路
+生产环境设计目标
+企业级设计方向
+生产环境常见做法
+不可以说
+已上线生产
+真实生产数据
+已实现完整 ERP
+员工已登录审批
+LLM 已接入
+企业级 RBAC 已完成
+除非原实录确有证据。
+63. 必须重新检查所有“AI 拟稿”
+凡原 txt 里有：
+AI 拟稿
+必须保留这种历史事实。
+但必须区分：
+AI 生成草稿 ≠ 用户最终执行结果 
+尤其建表 SQL、代码、YAML：
+必须能看出哪些是建议草稿，哪些是真正执行过的最终内容。
+64. 必须恢复原 txt 中的“思维导图式表达”
+原 txt 中出现的：
+员工 ↓ 项目 ↓ 业务申请 ↓ 审批 ↓ 财务 ↓ Contract 
+以及：
+两个世界 
+以及：
+LLM ↓ Contract / Incident / SQL 
+都必须保留结构。
+不要为了“像文章”而全部变成连续大段文字。
+65. 必须恢复原 txt 中的“决策演变”
+特别注意这些演变：
+演变一
+不是直接 PostgreSQL。
+而是：
+原 Parquet ↓ 发现数据源不够真实 ↓ 考虑数据库 ↓ 选择 PostgreSQL 
+演变二
+不是一开始就 6 张表。
+需要让读者理解：
+先建立业务基础表 ↓ 逐步补 business_requests ↓ 补 approval_records ↓ 最后 journal_entries ↓ 形成 6 表 + View 
+演变三
+不是一开始就有 72 checks。
+必须明确：
+25 ↓ 28 ↓ 34 ↓ 55 ↓ 63 ↓ 72 
+演变四
+不是直接大规模造数。
+必须：
+12 条 ↓ 生成器 ↓ 10 条冒烟 ↓ 修错误 ↓ 10,000 条 
+演变五
+不是生成器发现正常就结束。
+还要：
+正常 ↓ 异常注入 ↓ FAIL ↓ 恢复 ↓ Pytest ↓ Dashboard 
+66. 必须保留真实报错的“因果链”
+例如：
+column "status" does not exist 
+不能只写：
+“这里有个字段错误。”
+必须说明：
+代码以为字段叫 status ↓ 数据库真实字段是 project_status ↓ PostgreSQL 报错 ↓ 回查 \d projects ↓ 确认真实 Schema ↓ 修改查询 ↓ 继续运行 
+67. boolean 错误也必须做成清晰解释
+必须明确：
+approval_records same_preparer_approver_flag = BOOLEAN 
+所以：
+False / True 
+而：
+journal_entries same_preparer_approver_flag = INTEGER 
+所以：
+0 / 1 
+不能把这两张表混为一谈。
+68. 必须解释 View 和 Table 的区别
+必须使用清晰对比：
+TableView真正保存数据保存查询定义INSERT / UPDATE 数据通常不直接作为存储事实是事实/主数据表是派生接口journal_entrieserp_transactions
+必须联系本项目：
+journal_entries 是底层事实表。
+erp_transactions 是 Data Contract 接口。
+69. 必须解释 mustBe: 0
+必须用业务类比：
+SQL = 把违规数据挑出来点数  mustBe: 0 = 不合格品必须为 0 
+不要只解释成：
+“这是一个参数。”
+70. 必须解释为什么 library → SQL
+不要把它说成：
+library 不高级 / SQL 更高级。
+应该说：
+在本机当前 CLI 版本和当前这套写法下，旧 type: library + invalidValues 没有产生预期有效检查。
+因此：
+library ↓ 运行结果没有检查 ↓ 改为 SQL ↓ SQL 直接查询违规数量 ↓ mustBe: 0 ↓ 真正出现 FAIL 
+关于“是不是 CLI Bug”，必须保持谨慎：
+记录运行现象和版本差异。
+如果没有明确官方确认，就不能写：
+“官方已确认这是 Bug”。
+71. 必须处理旧 JSON 与新版 JSON 的区别
+Dashboard V1：
+读旧 JSON 
+因此容易出现：
+旧报告： 55 / 55  当前 Contract： 72 / 72 
+必须明确解释：
+JSON 是某次 Contract 执行结果的快照。
+YAML 才是当前规则定义。
+PostgreSQL 才是当前业务数据源。
+72. 必须建立“三层数据主权”概念
+建议直接做一张表：
+层谁拥有数据谁能做什么PostgreSQL业务数据存储 / 查询Data Contract质量规则检查Streamlit展示SELECT / 展示
+并用一句话总结：
+PostgreSQL 是数据源，Data Contract 是质量层，Streamlit 是展示层。
+73. 必须对“Dashboard 是不是数据库”做认知解释
+明确：
+Docker ≠ PostgreSQL  PostgreSQL ≠ Streamlit  Streamlit ≠ Data Contract  Data Contract ≠ Kestra 
+每个负责一层职责。
+74. 必须逐项重新核对 46 个问题
+最终必须在内部建立一张验收表，至少包含：
+问题编号 问题标题 是否已覆盖 覆盖卷 覆盖章节 是否有思路讨论 是否有具体证据 是否有结构化图表 是否有闭环 是否存在事实问题 
+75. A 组必须逐项验收
+A1 VSCode 为什么看不到表 A2 SQL 怎么进入 PostgreSQL A3 Docker 里为什么找不到表 A4 \d 为什么不能在 PowerShell 使用 A5 为什么单独建 erp_demo A6 如何真正看见数据库表 
+A6 必须强化。
+76. B 组必须逐项验收
+B7 YAML 怎么连接数据库 B8 Flow 和 Contract 的关系 B9 Namespace Files B10 localhost vs postgres B11 两份 Contract 同步 B12 library → SQL B13 CLI 1.2.0 / 1.2.1 B14 55 / 72 
+77. C 组必须逐项验收
+C15 为什么先 12 条 C16 为什么不直接随机 C17 安全金额 / flag / seed C18 status 报错 C19 boolean C20 rollback C21 10 → 10000 
+78. D 组必须逐项验收
+D22 为什么 PASS 后还要 FAIL D23 为什么选 10008～10012 D24 为什么改 journal_entries D25 为什么恢复 D26 不允许第二次 PASS 造假 
+79. E 组必须逐项验收
+E27 Data Contract 为什么还需要 Pytest E28 为什么是 5 项 E29 5 passed 为什么重要 
+E29 不允许把 2.84 秒包装成永久性能保证。
+80. F 组必须逐项验收
+F30 Dashboard 是什么 F31 为什么旧版 55/55 F32 为什么出现 
+
+ F33 为什么连 PostgreSQL F34 为什么需要独立重新执行 Contract F35 为什么中文化 
+81. G 组必须逐项验收
+G36 员工登录 G37 自动字段 / 下拉 / 手填 G38 提交后同步 G39 员工 A / B 审批关系 G40 企业变更治理 G41 数据库信息业务化展示 
+G39 必须加入员工 A/B 流程图。
+82. H 组必须逐项验收
+H42 自然语言 → YAML H43 Contract Change Approval H44 Incident Copilot H45 NL2SQL H46 PII / 财务敏感分类 
+H42～H46 必须拆成五个独立小节。
+不允许：
+“第四层：LLM Copilot”一大段统包。
+83. 每个 A～H 问题都必须知道“在哪一卷”
+最终内部验收表至少要达到：
+编号所在卷所在章节独立展开A1卷一...是/否A2卷一...是/否............H46卷四...是/否
+任何：
+“顺带提到”
+都不得标记为完成。
+84. 不要为了“信息很多”而无脑加文字
+这次并不是：
+文字越多越好。
+而是：
+内容全面 + 结构清晰。
+例如：
+一个审批关系：
+用图。
+一个字段分类：
+用表。
+一个版本演进：
+用时间线表。
+一个 Docker / psql 层次：
+用层次图。
+一个业务血缘：
+用流程图。
+一个技术原理：
+用少量文字解释。
+85. 图表不是装饰，而是解决“我看不懂系统”的工具
+尤其下面这些必须优先做成结构化元素：
+① 整体架构 ② 业务数据生产线 ③ 数据治理线 ④ 6 表血缘 ⑤ Contract 数据接口 ⑥ 55→72 ⑦ 12→22→10022 ⑧ 生成器五步 ⑨ 5 异常映射 ⑩ Pytest 分层 ⑪ Dashboard 三版本 ⑫ Kestra / Dashboard 双执行 ⑬ PowerShell / psql / PostgreSQL ⑭ 当前实现 / 未来规划 ⑮ ERP 两个世界 ⑯ LLM Copilot ⑰ 企业变更治理 ⑱ PII 分类 
+86. 必须保留所有真正有证据的完整代码
+至少：
+generate_demo_data.py test_data_quality.py financial_data_contract.yaml 关键 CREATE TABLE 关键 CREATE VIEW 关键 UPDATE 关键 SELECT Kestra Flow Dashboard app.py 
+但是：
+只有实录里真正存在的完整代码才能宣称“一字不差”。
+如果当前报告引用的是：
+... 
+则必须回原 txt 判断是否存在完整版本。
+如果完整版本存在：
+恢复。
+如果完整版本不存在：
+不伪造。
+87. 必须保留错误日志
+例如：
+column "status" does not exist 
+is of type boolean but expression is of type integer 
+以及：
+5 passed in 2.84s 
+以及：
+was 1, expected = 0 
+这些都是项目证据。
+不能被压缩成：
+“后来修好了。”
+88. 必须保留“导师/用户确认结果”
+例如：
+“是 0 了”
+这种结果如果它是实际对话中的验证节点，可以保留在叙事里。
+但不能把这种自然语言确认伪装成：
+正式终端 PASS。
+89. 对原 txt 中“未来设计”的处理规则
+任何出现：
+接下来可以做 下一阶段做 未来可以 我建议 以后可以 如果要真正企业化 还能加 
+的内容：
+必须先检查它到底有没有实际执行。
+如果没有：
+标注“设计设想 / 后续规划”。
+不要直接移动到“当前系统功能”。
+90. 最终报告必须有一个“事实边界总表”
+放卷四结尾。
+建议：
+内容当前状态证据PostgreSQL已实现erp_demo6 表 + 1 View已实现psql10,022 笔已实现Dashboard / SQL72 checks已实现datacontract ci5 类异常 FAIL已验证Contract 输出数据恢复已实现五项计数归零Pytest已实现5 passedKestra已实现06:00DingTalk已实现告警链Streamlit已实现Dashboard员工登录未实现设计真人审批未实现设计RBAC未实现设计LLM未实现设计PII 自动分类未实现设计
+91. 最终报告的核心架构必须统一成这一版
+不要再出现多个互相矛盾的架构图。
+统一：
+                    PostgreSQL / erp_demo                              │               ┌──────────────┴──────────────┐               ↓                             ↓         业务数据生产线                   数据治理线               ↓                             ↓ employees / projects /             Data Contract YAML approval_policies                         ↓               ↓                       datacontract ci business_requests                          ↓               ↓                         72 checks approval_records                            ↓               ↓                          Kestra journal_entries                              ↓               ↓                         DingTalk erp_transactions               └──────────────┬──────────────┘                              ↓                        Streamlit 
+当前数据生成器只是：
+业务数据生产线的模拟数据发生器 
+不是：
+真实 ERP 前台 
+92. 最终写作风格
+保留旧报告风格：
+第一人称；
+现场感；
+技术概念当场解释；
+财务类比；
+闭环小结；
+版本编号；
+自然叙事。
+但必须比旧报告更加结构化：
+文字负责解释原因。
+表格负责压缩信息。
+图负责展示关系。
+代码负责证明实现。
+终端输出负责证明执行。
+93. 最终“逐行自检”必须真的执行
+在修订完成后，不要直接输出。
+先自己做一次最终审计。
+必须检查：
+Prompt 事实自检
+[ ] 55 是否错误地写成 Parquet 阶段？ [ ] approval_level 是否被错误叫成 0/1 flag？ [ ] 是否还存在 100 万行“已经成功”的说法？ [ ] 是否还存在 20260922？ [ ] 是否还存在“数据完全一样”？ [ ] 是否还存在 df.to_sql 作为最终实现？ [ ] 是否还存在 chunksize/page_size 混淆？ [ ] 是否还存在 healthcheck = Kestra 连接保证？ [ ] 是否还存在 risk_class 正常生成 HIGH？ [ ] 是否把 CLI 1.2.0 / 1.2.1 混成统一版本？ [ ] 是否把 Dashboard 写成实时推送？ [ ] 是否把 Dashboard 和 Kestra 写成同一次 execution？ [ ] 是否伪造第二次 PASS？ [ ] 是否把 4 类风险写成 5 类事实？ 
+结构自检
+[ ] 全文开篇总体思路 [ ] 两条主线 [ ] 6 表血缘图 [ ] 字段映射表 [ ] employees 权限表 [ ] approval_policies 表 [ ] business_requests 输入方式表 [ ] approval_records 表 [ ] PowerShell / psql 层次表 [ ] Docker / PostgreSQL / Kestra 表 [ ] 55→72 表 [ ] Rule Inventory [ ] 12→22→10022 [ ] 生成器流程图 [ ] 版本演进表 [ ] 异常映射表 [ ] 异常验证图 [ ] Pytest 对比图 [ ] Dashboard 三版本表 [ ] Dashboard / Kestra 双执行图 [ ] 当前 vs 未来表 [ ] 企业变更治理表 [ ] ERP 两世界图 [ ] LLM 总架构 [ ] LLM 权限边界图 [ ] PII 分类表 
+94. A～H 最终自检
+必须逐项：
+A1 ✅ / ❌ A2 ✅ / ❌ ... A6 ✅ / ❌  B7 ✅ / ❌ ... B14 ✅ / ❌  C15 ✅ / ❌ ... C21 ✅ / ❌  D22 ✅ / ❌ ... D26 ✅ / ❌  E27 ✅ / ❌ ... E29 ✅ / ❌  F30 ✅ / ❌ ... F35 ✅ / ❌  G36 ✅ / ❌ ... G41 ✅ / ❌  H42 ✅ / ❌ ... H46 ✅ / ❌ 
+任何一个是 ❌，先修报告再结束。
+95. 特别要求：不得把“有内容”当成“已完成”
+判定标准：
+不合格：
+“报告后面提到过 H42。”
+合格：
+“H42 独立小节 + 思路讨论 + 设计流程图 + 安全边界 + 当前未实现说明 + 闭环。”
+不合格：
+“报告里说过业务表之间有关系。”
+合格：
+“有 6 表血缘图 + 每张表角色表 + 字段解释。”
+不合格：
+“报告里说过 Dashboard 有三个版本。”
+合格：
+“V1/V2/V3 表格 + 每版变化 + 具体代码/问题 + 最终数据流图。”
+96. 最终篇幅要求
+再次强调：
+我不怕篇幅多。
+宁可：
+4 卷内容比现在增加 30%～50%
+也不要：
+为了缩短而把关键过程、表格、图、代码和解释删掉。
+但是：
+增加内容必须增加理解价值。
+禁止无意义重复。
+同一个概念已经完整解释过，可以在后面简短引用。
+但是：
+关键表、关键架构图、关键时间线不要因为“前面讲过”而全部删掉。
+97. 最终目标
+最后四卷应该让一个完全不了解这个项目的人，顺着看下来自然形成：
+我原来有一个 Data Contract         ↓ 但它依赖静态数据         ↓ 所以我补业务数据库         ↓ 业务被拆成 6 张表         ↓ 财务事实通过 View 暴露成契约接口         ↓ 先用 12 条数据验证         ↓ 再写生成器扩大到 10,022 条         ↓ 正常数据先 PASS         ↓ 故意注入 5 类异常         ↓ Contract FAIL         ↓ 恢复干净基线         ↓ Pytest 建立自动回归         ↓ Kestra 每天 06:00 自动执行         ↓ 失败钉钉告警         ↓ Streamlit 中文 Dashboard         ↓ 最终形成完整数据质量工程闭环         ↓ 再讨论未来 ERP / RBAC / LLM Copilot 
+这才是最终报告真正应该传递出的逻辑。
+98. 最终执行指令
+现在开始修订四卷。
+必须：
+先核对事实，再修结构，再补图表，再补文字，再做 A～H 逐题验收，最后做全文事实审计。
+不要：
+直接从第一卷一路润色到第四卷，然后认为任务结束。
+必须反向检查：
+提示词 ↓ 原始 txt ↓ 当前四卷 ↓ 差异 ↓ 补写 ↓ 结构化 ↓ 最终验收 
+最后必须确认：
+没有把计划中的东西写成已实现；没有把后期结果倒推到前期；没有把原 txt 的结构化内容全部散文化；没有把一个大段落当成多个问题的完成证明；没有继续保留已经确认错误的技术表述。
+终极验收标准
+“全面”不是字数多。
+“逻辑清晰”不是标题多。
+“能看懂”不是写得幼稚。
+真正标准是：
+事实有证据、因果有链路、技术有解释、关系有图、字段有表、演进有时间线、版本有记录、异常有验证、现状与未来有边界。
+做到这一点，再结束。
