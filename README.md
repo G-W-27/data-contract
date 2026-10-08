@@ -151,22 +151,28 @@ request_id / model / prompt_version / input_hash / 脱敏摘要 / output / times
 ## 九、快速复现
 
 ```bash
-# 1. 起 PostgreSQL + Kestra（Docker）
-cd 8_项目产出合集_源码_PPT_讲稿_简历/02_项目源代码_data-contract-demo/kestra
-docker compose up -d
+cd 8_项目产出合集_源码_PPT_讲稿_简历/02_项目源代码_data-contract-demo
 
-# 2. 建库并生成仿真业务数据
-#    执行 database/ 下的建表 SQL，然后：
-python generate_demo_data.py     # 生成 10,022 笔交易
+# 1. 建库：执行 database/ 下的建表 SQL（PostgreSQL 中）
+#    连接口令只从环境变量读取：DATACONTRACT_POSTGRES_PASSWORD 或 ERP_DB_PASSWORD
+
+# 2. 生成仿真业务数据（10,022 笔）
+python generate_demo_data.py
 
 # 3. 跑契约检查（72 项）
 datacontract test financial_data_contract.yaml
 
 # 4. 回归测试
 pytest -q
+
+# 5. Evals 离线回放（CI 门禁）
+python evals/run_evals.py
 ```
 
 数据库连接口令**只从环境变量读取**（`DATACONTRACT_POSTGRES_PASSWORD` 或 `ERP_DB_PASSWORD`），代码中不存在任何硬编码口令。
+
+> **关于 Kestra / Docker 编排**：`kestra/docker-compose.yml` **未纳入本仓库**——原工程将其视为独立运行时子项目排除在外，且该文件可能包含数据库连接口令，出于隐私考虑不做上传。
+> 契约检查本身可直接用 `datacontract test` 运行，不依赖 Kestra；定时编排部分请参看卷三报告中的配置说明自行搭建。
 
 ---
 
@@ -191,6 +197,7 @@ pytest -q
 
 - 所有**本机绝对路径**已替换为占位符：`<项目根目录>`、`<用户目录>`、`<Python安装目录>`、`<PPT工程目录>`、`<node_modules目录>`；WSL / 系统用户名替换为 `<用户名>`。
 - 代码中**无任何硬编码口令、密钥、令牌或 Webhook**；口令一律走环境变量。
+- **未纳入本仓的内容**（原工程即有意为之，非遗漏）：`*.parquet` 演示数据（可脚本重新生成）、`*.log` 运行与审计日志、`kestra/` 运行时编排配置（可能含数据库连接口令）、已作废的历史契约备份。
 - 演示用的手机号 / 身份证 / 邮箱均为**构造样本**，仅用于展示 PII 掩码效果。
 - 数据口径说明：库内数据为**仿真 ERP 环境中由业务操作产生的演示数据**，不是生产数据。
 
